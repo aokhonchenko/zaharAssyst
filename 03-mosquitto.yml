@@ -33,5 +33,3 @@
           TZ: Europe/Moscow
         volumes:
           - "~/mosquitto:/mosquitto/config"
-    - name: Задание пароля для mosquitto
-      command: echo -n "docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/mosquitto_password_file iot_user" | xclip

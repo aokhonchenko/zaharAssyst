@@ -1,0 +1,1 @@
+echo -n "docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/mosquitto_password_file iot_user" | xclip
