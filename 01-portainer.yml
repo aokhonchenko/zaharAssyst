@@ -1,6 +1,6 @@
 ---
-- name: Развертывание умного дома
-  hosts: all
+- name: Развертывание portainer
+  hosts: localhost,all
   vars:
     my_variable: "Пример значения переменной"
     nginx_ver: "1.18.0"
@@ -18,6 +18,8 @@
         restart_policy: always
         published_ports:
           - "9000:9000"
+        env:
+          TZ: Europe/Moscow
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock"
           - "portainer_data:/data"

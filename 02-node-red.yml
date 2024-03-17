@@ -1,0 +1,24 @@
+---
+- name: Развертывание node-red
+  hosts: localhost,all
+  vars:
+    my_variable: "Пример значения переменной"
+    nginx_ver: "1.18.0"
+  tasks:
+    - name: Создание хранилища данных для Node-red
+      command: docker volume create node_red_data
+      args:
+        warn: no
+
+    - name: Запуск Node-red
+      docker_container:
+        name: node-red
+        image: nodered/node-red
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "1880:1880"
+        env:
+          TZ: Europe/Moscow
+        volumes:
+          - "node_red_data:/data"

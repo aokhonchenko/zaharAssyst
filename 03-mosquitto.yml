@@ -1,0 +1,37 @@
+---
+- name: Развертывание mosquitto
+  hosts: all,localhost
+  tasks:
+#    - name: Создание хранилища данных для mosquitto
+#      command: docker volume create mosquitto-volume
+#      args:
+#        warn: no
+    - name: Создаем директорию для конфига
+      file:
+        state: directory
+        path: ~/mosquitto
+    - name: Создаем конфиги
+      file:
+        state: touch
+        path: ~/mosquitto/mosquitto.conf
+    - name: Создаем еще конфиги
+      file:
+        state: touch
+        path: ~/mosquitto/mosquitto_password_file
+    - name: Наполняем conf
+      command: echo -e "listener 1883\nallow_anonymous false\npassword_file /mosquitto/config/mosquitto_password_file" > mosquitto/mosquitto.conf
+    - name: Запуск mosquitto
+      docker_container:
+        name: mosquitto
+        image: eclipse-mosquitto
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "1883:1883"
+          - "9001:9001"
+        env:
+          TZ: Europe/Moscow
+        volumes:
+          - "~/mosquitto:/mosquitto/config"
+    - name: Задание пароля для mosquitto
+      command: echo -n "docker exec -it mosquitto mosquitto_passwd -c /mosquitto/config/mosquitto_password_file iot_user" | xclip
