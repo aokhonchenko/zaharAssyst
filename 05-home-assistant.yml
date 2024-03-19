@@ -1,0 +1,30 @@
+---
+- name: развертывание home assistant
+  hosts: all,localhost
+  vars:
+    ha_config_dir: haconfig
+  tasks:
+    - name: создаем директорию для конфига Home Assistant
+      file:
+        state: directory
+        path: '{{ha_config_dir}}'
+
+    - name: создаем volume для Home Assistant
+      command: docker volume create ha_data
+      args:
+        warn: no
+
+    - name: создаем контейнер
+      docker_container:
+        name: homeassistant
+        privileged: true
+        image: ghcr.io/home-assistant/home-assistant:stable
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "8123:8123"
+        env:
+          TZ: Europe/Moscow
+        volumes:
+          - "{{ha_config_dir}}:/config"
+          - "/run/dbus:/run/dbus:ro"
