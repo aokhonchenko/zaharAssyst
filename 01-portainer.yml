@@ -18,6 +18,7 @@
         restart_policy: always
         published_ports:
           - "9000:9000"
+          - "9443:9443"
         env:
           TZ: Europe/Moscow
         volumes:
