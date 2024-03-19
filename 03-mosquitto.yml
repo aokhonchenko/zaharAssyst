@@ -2,24 +2,18 @@
 - name: Развертывание mosquitto
   hosts: all,localhost
   tasks:
-   - name: Создание хранилища данных для mosquitto
-     command: docker volume create mosquitto-volume
-     args:
-       warn: no
-    # - name: Создаем директорию для конфига
-    #   file:
-    #     state: directory
-    #     path: ~/mosquitto
-    # - name: Создаем конфиги
-    #   file:
-    #     state: touch
-    #     path: ~/mosquitto/mosquitto.conf
-    # - name: Создаем еще конфиги
-    #   file:
-    #     state: touch
-    #     path: ~/mosquitto/mosquitto_password_file
-    # - name: Наполняем conf
-    #   command: echo -e "listener 1883\nallow_anonymous false\npassword_file /mosquitto/config/mosquitto_password_file" > mosquitto/mosquitto.conf
+    - name: Создание хранилища данных для mosquitto
+      command: docker volume create mosquitto_data
+      args:
+        warn: no
+    - name: Создание хранилища настроек для mosquitto
+      command: docker volume create mosquitto_config
+      args:
+        warn: no
+    - name: Создание хранилища логов для mosquitto
+      command: docker volume create mosquitto_log
+      args:
+        warn: no
     - name: Запуск mosquitto
       docker_container:
         name: mosquitto
@@ -27,13 +21,12 @@
         state: started
         restart_policy: unless-stopped
         published_ports:
-          - "1883:1883/tcp"
-          - "9001:9001"
+         - "1883:1883/tcp"
+         - "9001:9001"
         env:
-          TZ: Europe/Moscow
+         TZ: Europe/Moscow
         volumes:
-          - mosquitto-volume/config:/mosquitto/config
-          - mosquitto-volume/data:/mosquitto/data
-          - mosquitto-volume/log:/mosquitto/log
-        stdin_open: true
+         - mosquitto_config:/mosquitto/config
+         - mosquitto_data:/mosquitto/data
+         - mosquitto_log:/mosquitto/log
         tty: true
