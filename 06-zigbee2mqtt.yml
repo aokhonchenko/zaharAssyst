@@ -2,7 +2,7 @@
 - name: развертывание zigbee2mqtt
   hosts: all,localhost
   tasks:
-    - name: создаем volume для Home Assistant
+    - name: создаем volume для zigbee2mqtt
       command: docker volume create zigbee2mqtt_data
       args:
         warn: no
