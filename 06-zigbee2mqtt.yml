@@ -1,0 +1,25 @@
+---
+- name: развертывание zigbee2mqtt
+  hosts: all,localhost
+  tasks:
+    - name: создаем volume для Home Assistant
+      command: docker volume create zigbee2mqtt_data
+      args:
+        warn: no
+
+    - name: создаем контейнер
+      docker_container:
+        name: zigbee2mqtt
+        privileged: true
+        image: koenkk/zigbee2mqtt
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "8099:8099/tcp"
+        env:
+          TZ: Europe/Moscow
+        volumes:
+          - "zigbee2mqtt_data:/app/data"
+          - "/run/udev:/run/udev:ro"
+        devices:
+          - /dev/serial/by-id/usb-ITead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_640e667921b6ed11a321d60ea8669f5d-if00-port0:/dev/ttyUSB0
