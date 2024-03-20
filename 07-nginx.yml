@@ -1,0 +1,14 @@
+---
+- name: nginx сервер для статик ресурсов
+  hosts: all, localhost
+  tasks:
+    - name: Run nginx Docker container
+      docker_container:
+        name: nginx
+        image: nginx
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "80:80"
+        volumes:
+          - "nginx-data:/usr/share/nginx/html:ro"
