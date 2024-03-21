@@ -1,0 +1,48 @@
+---
+- name: Подключаем локальный AI на основе ollama
+  hosts: all, localhost
+  tasks:
+    - name: создаем volume для ollama
+      command: docker volume create ollama_data
+      args:
+        warn: no
+
+    - name: создаем контейнер
+      docker_container:
+        name: ollama
+        privileged: true
+        image: ollama/ollama
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "11434:11434/tcp"
+        env:
+          TZ: Europe/Moscow
+        volumes:
+          - "ollama_data:/root/.ollama"
+
+# сначала выполнить
+# ansible-galaxy collection install community.docker
+    - name: запускаем ИИ в контейнере
+      community.docker.docker_container_exec:
+        container: ollama
+        command: ollama run llama2
+
+    - name: запуск интерфейса на порту 3000
+      docker_container:
+        name: ollama-webui
+        privileged: true
+        image: ghcr.io/ollama-webui/ollama-webui:main
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "3000:8080/tcp"
+        env:
+          TZ: Europe/Moscow
+      
+
+      #  --add-host=host.docker.internal:host-gateway 
+  
+
+      # docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway --name ollama-webui --restart always ghcr.io/ollama-webui/ollama-webui:main
+  
